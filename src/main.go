@@ -1,94 +1,118 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"image"
 	"image/color"
+	"math"
+	"path/filepath"
 	//"image/draw"
 	"image/png"
-	"math"
-	"math/cmplx"
+	//"math"
+	//"math/cmplx"
 	"os"
 )
 
 const (
-	WIDTH            = 1200
-	HEIGHT           = 800
-	XMIN     float64 = -2
-	XMAX     float64 = 1
-	YMIN     float64 = -1
-	YMAX     float64 = 1
-	MAX_ITER float64 = 100 // Actually an int. but go sucks
+	WIDTH  = 400
+	HEIGHT = 400
 )
 
-//https://code.google.com/p/gorilla/source/browse/color/hsv.go?r=ef489f63418265a7249b1d53bdc358b09a4a2ea0
-func HSVToRGB(h, s, v float64) (r, g, b uint8) {
-	var fR, fG, fB float64
-	i := math.Floor(h * 6)
-	f := h*6 - i
-	p := v * (1.0 - s)
-	q := v * (1.0 - f*s)
-	t := v * (1.0 - (1.0-f)*s)
-	switch int(i) % 6 {
-	case 0:
-		fR, fG, fB = v, t, p
-	case 1:
-		fR, fG, fB = q, v, p
-	case 2:
-		fR, fG, fB = p, v, t
-	case 3:
-		fR, fG, fB = p, q, v
-	case 4:
-		fR, fG, fB = t, p, v
-	case 5:
-		fR, fG, fB = v, p, q
-	}
-	r = uint8((fR * 255) + 0.5)
-	g = uint8((fG * 255) + 0.5)
-	b = uint8((fB * 255) + 0.5)
-	return
+func PixelToPoint(x, y int) (float64, float64) {
+	return float64(x*2)/float64(WIDTH) - 1,
+		float64(y*2)/float64(HEIGHT) - 1
 }
 
-func calculateColor(col *color.RGBA, x, y float64) {
-	z := complex(x, y)
-	c := complex(x, y)
-
-	var iter float64 = 0
-	for ; (iter < MAX_ITER) && (cmplx.Abs(z) < 2); iter++ {
-		z = z*z + c
-	}
-
-	if iter == MAX_ITER {
-		col.R, col.G, col.B = 0, 0, 0
-	} else {
-		col.R, col.G, col.B = HSVToRGB(iter/MAX_ITER, 1, 1)
-	}
-	//real(z), 1, imag(z))
-
+func PointToPixel(x, y float64) (int, int) {
+	return int((x + 1) / 2 * WIDTH),
+		int((y + 1) / 2 * HEIGHT)
 }
 
 func main() {
+
+	var percent *float64
+	var dir *string
+	percent = flag.Float64("p", 0, "")
+	dir = flag.String("dir", ".", "")
+	flag.Parse()
+	configure(*percent)
+
+	//Coefs[0].p = *percent
+	//Coefs[1].p = 1 - *percent
+
+	//Coefs[0].p = .1
+	//Coefs[1].p = .9
+
+	//Variations[0].w = *percent
+	//Variations[1].w = 1 - *percent
+
+	histogram := make([][]float64, HEIGHT)
+	for i := range histogram {
+		histogram[i] = make([]float64, WIDTH)
+	}
+
+	var max_val float64 = 0
+	/*for py := 0; py < HEIGHT; py++ {
+		for px := 0; px < WIDTH; px++ {
+			//p, ok := swirl[spherical[Point{x, y}]]
+
+			x, y := PointToPixel(
+				spherical(swirl(
+					spherical(swirl(
+						PixelToPoint(px, py))))))
+
+			if x < 0 || y < 0 || x >= WIDTH || y >= HEIGHT {
+				continue
+			}
+
+			histogram[y][x] += 1
+			if histogram[y][x] > max_val {
+				max_val = histogram[y][x]
+			}
+		}
+	}*/
+
+	for iter := 0; iter < 100; iter++ {
+		x, y := rnd.Float64(), rnd.Float64() // TODO(snail) pick a random point for this.
+
+		for i := 0; i < 10000; i++ {
+			x, y = randomFunction()(x, y)
+			if i > 20 {
+				// Plot
+				px, py := PointToPixel(x, y)
+				if px < 0 || py < 0 || px >= WIDTH || py >= HEIGHT {
+					continue
+				}
+
+				// Keep a running max
+				histogram[py][px] += 1
+				if histogram[py][px] > max_val {
+					max_val = histogram[py][px]
+				}
+			}
+		}
+	}
 	// Create an image.
 	m := image.NewRGBA(image.Rect(0, 0, WIDTH, HEIGHT))
 
 	c := color.RGBA{255, 255, 255, 255}
-	/*
-		//Fill it with black
-		draw.Draw(m, m.Bounds(),
-			&image.Uniform{color.RGBA{0, 0, 0, 255}},
-			image.ZP, draw.Src)
-	*/
-
 	// draw the pixels!
-	for x := float64(m.Bounds().Min.X); x < float64(m.Bounds().Max.X); x++ {
-		for y := float64(m.Bounds().Min.Y); y < float64(m.Bounds().Max.Y); y++ {
-			coord_x := XMIN + (XMAX-XMIN)*x/WIDTH
-			coord_y := YMIN + (YMAX-YMIN)*y/HEIGHT
-			calculateColor(&c, coord_x, coord_y)
+	//for x := float64(m.Bounds().Min.X); x < float64(m.Bounds().Max.X); x++ {
+	//	for y := float64(m.Bounds().Min.Y); y < float64(m.Bounds().Max.Y); y++ {
+	for y := 0; y < HEIGHT; y++ {
+		for x := 0; x < WIDTH; x++ {
+			c.R = uint8(math.Log(histogram[y][x]) * 255 / math.Log(max_val))
+			c.G = c.R
+			c.B = c.R
 			m.Set(int(x), int(y), c)
 		}
 	}
 
-	w, _ := os.Create("new.png")
+	path := filepath.Join(*dir, fmt.Sprintf("img%.2f.png", *percent))
+	fmt.Println(path)
+	w, _ := os.Create(path)
+	//	fmt.Sprintf("%v/img%.2f.png", filepath.Abs(*dir), *percent))
 	defer w.Close()
 	png.Encode(w, m) //Encode writes the Image m to w in PNG format.
 
