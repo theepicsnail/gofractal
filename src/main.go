@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	WIDTH  = 800
-	HEIGHT = 800
+	WIDTH  = 400
+	HEIGHT = 400
 
 	SCALE = 2 // How large of a coordinate system to fit in the image 2 = (-2 to 2)
 	XMIN  = -1 * SCALE
