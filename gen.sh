@@ -1,6 +1,6 @@
 #!/bin/bash
-rm imgs/*.png
-for i in `seq 0 .02 1` ; do
+DELTA=.02
+for i in `seq $DELTA $DELTA 1` ; do
   go run src/*.go -p=$i -dir=imgs &
 done
 
@@ -10,3 +10,4 @@ do
 done
 
 convert imgs/*.png imgs/`date +%s`.gif
+rm imgs/*.png
