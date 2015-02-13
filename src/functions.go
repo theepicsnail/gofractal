@@ -6,6 +6,7 @@ import (
 	"math/rand"
 )
 
+// Replace this with probability, point->point func, color -> color func
 type Coef struct{ p, a, b, c, d, e, f float64 }
 
 type WeightedVariation struct {
@@ -20,25 +21,25 @@ var Coefs = []Coef{}
 var Variations = []WeightedVariation{}
 
 // F_j(x,y) = Sum(V_k in Variations, ... )
-func F(j int, x, y float64) (float64, float64) {
-	var outX float64
-	var outY float64
+func F(j int, p Point) Point {
+	out := Point{}
 
-	// X and y coords passed into the variation
+	// This should just be the application of an affine transform
 	var coef = Coefs[j]
-	vx := coef.a*x + coef.b*y + coef.c
-	vy := coef.d*x + coef.e*y + coef.f
+	vx := coef.a*p.x + coef.b*p.y + coef.c
+	vy := coef.d*p.x + coef.e*p.y + coef.f
 
 	for _, variation := range Variations {
 		resultX, resultY := variation.f(vx, vy)
-		outX += variation.w * resultX
-		outY += variation.w * resultY
+		out.x += variation.w * resultX
+		out.y += variation.w * resultY
 	}
 
-	return outX, outY
+	return out
 }
 
-func randomFunction() func(float64, float64) (float64, float64) {
+func randomFunction() func(Point) Point {
+	// Rand int % length(Coefs) ?
 	r := rnd.Float64()
 	j := 0
 	for ; r < 1; j++ {
@@ -47,7 +48,9 @@ func randomFunction() func(float64, float64) (float64, float64) {
 	}
 	j -= 1
 
-	return func(x, y float64) (float64, float64) {
-		return F(j, x, y)
+	// Precompute and store these functions?
+	// Perhaps they are inlined since it's just tail recursion.
+	return func(p Point) Point {
+		return F(j, p)
 	}
 }

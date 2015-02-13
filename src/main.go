@@ -26,14 +26,14 @@ const (
 )
 
 /* Utilities for point <-> pixel based on the above constants */
-func PixelToPoint(x, y int) (float64, float64) {
-	return float64(x)*X_DELTA/float64(WIDTH) + XMIN,
-		float64(y)*Y_DELTA/float64(HEIGHT) + YMIN
+func PixelToPoint(x, y int) Point {
+	return Point{float64(x)*X_DELTA/float64(WIDTH) + XMIN,
+		float64(y)*Y_DELTA/float64(HEIGHT) + YMIN}
 }
 
-func PointToPixel(x, y float64) (int, int) {
-	return int((x - XMIN) / X_DELTA * WIDTH),
-		int((y - YMIN) / Y_DELTA * HEIGHT)
+func PointToPixel(p Point) (int, int) {
+	return int((p.x - XMIN) / X_DELTA * WIDTH),
+		int((p.y - YMIN) / Y_DELTA * HEIGHT)
 }
 
 func main() {
@@ -53,27 +53,24 @@ func main() {
 
 	var max_val float64 = 0
 
-	// is 100 different starting points any better than just 1 starting point?
-	for iter := 0; iter < 1; iter++ {
-		x, y := rnd.Float64(), rnd.Float64()
-		for i := 0; i < 10000000; i++ { // Points per random walk
-			x, y = randomFunction()(x, y)
+	pt := Point{rnd.Float64()*2 - 1, rnd.Float64()*2 - 1} // Random bi-unit square
+	for i := 0; i < 10000000; i++ {                       // Points per random walk
+		pt = randomFunction()(pt)
 
-			if i > 20 {
-				// Give the random walk time to get within a pixel of accurancy.
+		if i > 20 {
+			// Give the random walk time to get within a pixel of accurancy.
 
-				px, py := PointToPixel(x, y)
-				// TODO this check could be done before converting using px,py vs {X,Y}{MIN,MAX}
-				if px < 0 || py < 0 || px >= WIDTH || py >= HEIGHT {
-					continue
-				}
+			px, py := PointToPixel(pt)
+			// TODO this check could be done before converting using px,py vs {X,Y}{MIN,MAX}
+			if px < 0 || py < 0 || px >= WIDTH || py >= HEIGHT {
+				continue
+			}
 
-				// Keep a running max
-				// Perhaps this could be quicker instead of 3*2 lookups
-				histogram[py][px] += 1
-				if histogram[py][px] > max_val {
-					max_val = histogram[py][px]
-				}
+			// Keep a running max
+			// Perhaps this could be quicker instead of 3*2 lookups
+			histogram[py][px] += 1
+			if histogram[py][px] > max_val {
+				max_val = histogram[py][px]
 			}
 		}
 	}
