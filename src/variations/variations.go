@@ -17,9 +17,13 @@ func invsqrt(f float64) float64 {
 	return 1 / math.Sqrt(f)
 }
 
+var scale = func(x, y, factor float64) (float64, float64) {
+	return x * factor, y * factor
+}
+
 var Scale = func(factor float64) Variation {
 	return func(x, y float64) (float64, float64) {
-		return x * factor, y * factor
+		return scale(x, y, factor)
 	}
 }
 
@@ -33,7 +37,7 @@ var Spherical = func(x, y float64) (float64, float64) {
 		return x, y
 	}
 
-	return x / r, y / r
+	return scale(x, y, 1/r)
 }
 
 var Swirl = func(x, y float64) (float64, float64) {
@@ -86,7 +90,7 @@ var Fisheye = func(x, y float64) (float64, float64) {
 var Exponential = func(x, y float64) (float64, float64) {
 	var exp = math.Exp(x - 1)
 	var ypi = math.Pi * y
-	return exp * math.Cos(ypi), exp * math.Sin(ypi)
+	return scale(math.Cos(ypi), math.Sin(ypi), exp)
 }
 
 // Power
@@ -108,13 +112,11 @@ var Cosine = func(x, y float64) (float64, float64) {
 // Rings2
 
 var Eyefish = func(x, y float64) (float64, float64) {
-	var coef = 2 / (getR(x, y) + 1)
-	return x * coef, y * coef
+	return scale(x, y, 2/(getR(x, y)+1))
 }
 
 var Bubble = func(x, y float64) (float64, float64) {
-	var coef = 4 / (getR2(x, y) + 4)
-	return coef * x, coef * y
+	return scale(x, y, 4/(getR2(x, y)+4))
 }
 
 var Cylinder = func(x, y float64) (float64, float64) {
@@ -160,6 +162,5 @@ var Tangent = func(x, y float64) (float64, float64) {
 // Twintrian
 
 var Cross = func(x, y float64) (float64, float64) {
-	var coef = 1 / math.Abs(x*x-y*y)
-	return coef * x, coef * y
+	return scale(x, y, 1/math.Abs(x*x-y*y))
 }
