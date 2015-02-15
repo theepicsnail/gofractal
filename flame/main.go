@@ -1,7 +1,14 @@
 package main
 
-import "fmt"
+import "flag"
+import "github.com/theepicsnail/gofractal/flameutil"
 
 func main() {
-	fmt.Println("Flame")
+	flag.Parse()
+	config := flameutil.NewFlameConfig()
+	configure(config)
+
+	image := flameutil.NewImage()
+	flameutil.Render(config, image)
+	image.Save("out.png")
 }
