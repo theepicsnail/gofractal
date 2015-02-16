@@ -2,7 +2,6 @@ package flameutil
 
 import (
 	"flag"
-	"fmt"
 	"image"
 	"image/color"
 	"image/png"
@@ -143,14 +142,6 @@ func (flame *FlameImage) compute_color(x, y int) color.RGBA {
 				uint8(tot_g / tot_samples),
 				uint8(tot_b / tot_samples),
 				255,
-			}
-
-			if 199 < x && x < 202 && 199 < y && y < 205 {
-				fmt.Println(pixel_color)
-				/*				pixel_color.R = 255
-								pixel_color.G = 255
-								pixel_color.B = 255
-								tot_samples = flame.histogramMax*/
 			}
 		}
 		count = tot_samples
