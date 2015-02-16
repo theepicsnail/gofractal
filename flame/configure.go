@@ -19,8 +19,12 @@ var (
 func configure(config *flameutil.FlameConfig) {
 	p := *FLAG_PERCENT
 
-	config.AddVariation(.5, flameutil.Scale(loop(0)(p)))
-	config.AddFlameFunction(.33, flameutil.AffineTransform(.5, 0, 0, 0, .5, 0))
-	config.AddFlameFunction(.33, flameutil.AffineTransform(.5, 0, 1, 0, .5, 0))
-	config.AddFlameFunction(.34, flameutil.AffineTransform(.5, 0, 0, 0, .5, 1))
+	config.AddVariation(loop(0)(p), flameutil.Sinusoidal)
+	config.AddVariation(p*.5, flameutil.Swirl)
+	config.AddVariation(1-loop(0)(p), flameutil.Spherical)
+
+	config.AddFlameFunction(.2, flameutil.Rotation(p*math.Pi*2))
+	config.AddFlameFunction(.4, flameutil.AffineTransform(2, 0, 0, 0, 2, 0))
+	config.AddFlameFunction(.4, flameutil.AffineTransform(.5, 0, 0, 0, .5, 0))
+
 }
