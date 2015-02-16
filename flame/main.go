@@ -29,6 +29,7 @@ func main() {
 
 	image := flameutil.NewImage()
 	flameutil.Render(config, image)
-	image.Save(fmt.Sprintf(*FLAG_FILE, *FLAG_PERCENT))
-	fmt.Println(*FLAG_PERCENT)
+	file := fmt.Sprintf(*FLAG_FILE, *FLAG_PERCENT)
+	image.Save(file)
+	fmt.Println(file)
 }
