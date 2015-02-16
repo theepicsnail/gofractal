@@ -1,6 +1,9 @@
 package flameutil
 
-import "math/rand"
+import (
+	"image/color"
+	"math/rand"
+)
 
 /*
 	Play's the chaos game (using the provided config) on the provided image.
@@ -10,19 +13,22 @@ var Render = func(config *FlameConfig, image *FlameImage) {
 
 	// Staring point selected randomly from bi-unit square
 	point := NewPoint(rng.Float64()*2-1, rng.Float64()*2-1)
+	color := &color.RGBA{255, 255, 255, 255}
 
 	// Run the game for a few iterations before actually drawing
 	// This gives our point time to get closer into the 'solution'
 	for iter := 0; iter < 20; iter++ {
-		step(config, randomFlameFuncNumber(config, rng.Float64()), point)
+		id := randomFlameFuncNumber(config, rng.Float64())
+		step(config, id, point)
+		config.flameFunctions[id].colorMutator(color)
 	}
 
 	// Draw the fractal!
 	for iter := 0; iter < config.iterations; iter++ {
 		id := randomFlameFuncNumber(config, rng.Float64())
 		step(config, id, point)
-		// Coloring based on id should happen here
-		image.addPoint(point /*, color */)
+		config.flameFunctions[id].colorMutator(color)
+		image.addPoint(point, *color)
 	}
 }
 

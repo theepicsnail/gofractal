@@ -35,8 +35,7 @@ type FlameImage struct {
 
 type histogramData struct {
 	count float64
-	// color
-	// log desnitry thing for bluring?
+	color color.RGBA
 }
 
 func createHistogram(w, h int) [][]histogramData {
@@ -69,11 +68,12 @@ func NewImage() *FlameImage {
 }
 
 /* Adds a point to the histogram */
-func (img *FlameImage) addPoint(point *Point) {
+func (img *FlameImage) addPoint(point *Point, color color.RGBA) {
 	px := int((point.X + 1) / 2 * float64(img.imageWidth))
 	py := int((point.Y + 1) / 2 * float64(img.imageHeight))
 	if px >= 0 && py >= 0 && px < img.imageWidth && py < img.imageWidth {
 		img.histogram[py][px].count++
+		img.histogram[py][px].color = color
 		possibleMax := img.histogram[py][px].count
 		if possibleMax > img.histogramMax {
 			img.histogramMax = possibleMax
@@ -91,9 +91,10 @@ func (flame *FlameImage) Save(file string) {
 		for x := 0; x < flame.imageWidth; x++ {
 			brightness := math.Log(flame.histogram[y][x].count) /
 				math.Log(flame.histogramMax)
-			c.R = uint8(brightness * 255)
-			c.G = c.R/2 + c.R/4
-			c.B = 0 //c.R
+			base := flame.histogram[y][x].color
+			c.R = uint8(brightness * float64(base.R))
+			c.G = uint8(brightness * float64(base.G))
+			c.B = uint8(brightness * float64(base.B))
 			img.Set(int(x), int(y), c)
 		}
 	}

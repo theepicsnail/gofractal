@@ -10,7 +10,7 @@ type Variation struct {
 type FlameFunction struct {
 	probability    float64
 	transformation Transformation
-	/* color       color.Color */
+	colorMutator   ColorTransformation
 }
 
 var (

@@ -23,8 +23,14 @@ func configure(config *flameutil.FlameConfig) {
 	config.AddVariation(p*.5, flameutil.Swirl)
 	config.AddVariation(1-loop(0)(p), flameutil.Spherical)
 
-	config.AddFlameFunction(.2, flameutil.Rotation(p*math.Pi*2))
-	config.AddFlameFunction(.4, flameutil.AffineTransform(2, 0, 0, 0, 2, 0))
-	config.AddFlameFunction(.4, flameutil.AffineTransform(.5, 0, 0, 0, .5, 0))
+	config.AddFlameFunction(.2,
+		flameutil.Rotation(p*math.Pi*2),
+		flameutil.Color_NOOP)
+	config.AddFlameFunction(.4,
+		flameutil.AffineTransform(2, 0, 0, 0, 2, 0),
+		flameutil.Color_BLEND(flameutil.Color_BLUE))
+	config.AddFlameFunction(.4,
+		flameutil.AffineTransform(.5, 0, 0, 0, .5, 0),
+		flameutil.Color_BLEND(flameutil.Color_YELLOW))
 
 }

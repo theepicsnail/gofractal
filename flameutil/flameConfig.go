@@ -14,9 +14,9 @@ func NewFlameConfig() *FlameConfig {
 	return &FlameConfig{*FLAG_ITERATIONS, []Variation{}, []FlameFunction{}}
 }
 
-func (config *FlameConfig) AddFlameFunction(prob float64, function func(*Point)) *FlameConfig {
+func (config *FlameConfig) AddFlameFunction(prob float64, function func(*Point), color ColorTransformation) *FlameConfig {
 	config.flameFunctions = append(config.flameFunctions,
-		FlameFunction{prob, function})
+		FlameFunction{prob, function, color})
 	return config
 }
 
