@@ -65,6 +65,6 @@ func step(config *FlameConfig, flameNo int, point *Point) {
 	}
 
 	// Done computing weighted location. assign it to point.
-	point.X = input_point.X
-	point.Y = input_point.Y
+	point.X = tmp_point.X
+	point.Y = tmp_point.Y
 }
