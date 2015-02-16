@@ -19,18 +19,18 @@ var (
 func configure(config *flameutil.FlameConfig) {
 	p := *FLAG_PERCENT
 
-	config.AddVariation(loop(0)(p), flameutil.Sinusoidal)
-	config.AddVariation(p*.5, flameutil.Swirl)
-	config.AddVariation(1-loop(0)(p), flameutil.Spherical)
+	config.AddVariation(.99-loop(0)(p)*.2, flameutil.Spherical)
+	config.AddVariation(loop(0)(p)*.2+.01, flameutil.Heart)
 
 	config.AddFlameFunction(.2,
-		flameutil.Rotation(p*math.Pi*2),
+		//flameutil.Rotation(p*math.Pi*2),
+		flameutil.AffineTransform(-1, 0, 0, 0, 1, 0),
 		flameutil.Color_NOOP)
 	config.AddFlameFunction(.4,
 		flameutil.AffineTransform(2, 0, 0, 0, 2, 0),
-		flameutil.Color_BLEND(flameutil.Color_BLUE))
+		flameutil.Color_BLEND(flameutil.Color_RED))
 	config.AddFlameFunction(.4,
 		flameutil.AffineTransform(.5, 0, 0, 0, .5, 0),
-		flameutil.Color_BLEND(flameutil.Color_YELLOW))
+		flameutil.Color_BLEND(flameutil.Color_WHITE))
 
 }
