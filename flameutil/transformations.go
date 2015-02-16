@@ -53,4 +53,10 @@ var (
 		angle := p.R2()
 		Rotation(angle)(p)
 	}
+
+	Heart = func(p *Point) {
+		angle := p.Angle() * p.R()
+		p.X = math.Sin(angle)
+		p.Y = -math.Cos(angle)
+	}
 )
